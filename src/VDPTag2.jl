@@ -85,19 +85,37 @@ const VDPTagProblem = Union{VDPTagMDP,VDPTagPOMDP}
 mdp(p::VDPTagMDP) = p
 mdp(p::VDPTagPOMDP) = p.mdp
 
-function next_ml_target(p::VDPTagMDP, pos::Vec2)
+function next_ml_target(p::VDPTagMDP, pos::Vec2, dynamic_model)
     steps = round(Int, p.step_size/p.dt)
     for i in 1:steps
-        pos = rk4step(p, pos)
+        pos = rk4step(p, pos, dynamic_model)
     end
     return pos
 end
-next_ml_target(p::VDPTagMDP, pos::AbstractVector) = next_ml_target(p, convert(Vec2, pos))
+next_ml_target(p::VDPTagMDP, pos::AbstractVector, dynamic_model::Function) = next_ml_target(p, convert(Vec2, pos), dynamic_model)
 
-function POMDPs.transition(pp::VDPTagProblem, s::TagState, a::Float64)
+# function POMDPs.transition(pp::VDPTagProblem, s::TagState, a::Float64)
+#     ImplicitDistribution(pp, s, a) do pp, s, a, rng
+#         p = mdp(pp)
+#         targ = next_ml_target(p, s.target) + p.pos_std*SVector(randn(rng), randn(rng))
+#         agent = barrier_stop(p.barriers, s.agent, p.agent_speed*p.step_size*SVector(cos(a), sin(a)))
+#         return TagState(agent, targ)
+#     end
+# end
+
+function POMDPs.transition(pp::VDPTagProblem, s::TagState, a::Float64, hy::String)
+    if hy == "VDP"
+        dynamic_model = vdp_dynamics(pp.mu, s.target)
+    elseif hy == "Dubins"
+        v = pp.agent_speed*p.step_size
+        u = a
+        dynamic_model = dubins_dynamics(s.agent, s.theta, v, u)
+    else
+        error("Invalid hypothesis. Please choose between 'VDP' or 'Dubins'.")
+    end
     ImplicitDistribution(pp, s, a) do pp, s, a, rng
         p = mdp(pp)
-        targ = next_ml_target(p, s.target) + p.pos_std*SVector(randn(rng), randn(rng))
+        targ = next_ml_target(p, s.target, dynamic_model) + p.pos_std*SVector(randn(rng), randn(rng))
         agent = barrier_stop(p.barriers, s.agent, p.agent_speed*p.step_size*SVector(cos(a), sin(a)))
         return TagState(agent, targ)
     end
