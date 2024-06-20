@@ -1,4 +1,6 @@
 module VDPTag2
+# this is a multiple model version of VDPTag2
+# Ofer Dagan 6/19/2024
 
 # package code goes here
 using POMDPs
