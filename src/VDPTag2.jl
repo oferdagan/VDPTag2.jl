@@ -77,7 +77,7 @@ end
 @with_kw struct VDPTagPOMDP{B} <: POMDP{TagState, TagAction, Vec8}
     mdp::VDPTagMDP{B}           = VDPTagMDP()
     meas_cost::Float64          = 5.0
-    active_meas_std::Float64    = 0.5
+    active_meas_std::Float64    = 1.0
     meas_std::Float64           = 5.0
 end
 
