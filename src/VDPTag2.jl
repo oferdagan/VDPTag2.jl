@@ -78,7 +78,7 @@ end
     mdp::VDPTagMDP{B}           = VDPTagMDP()
     meas_cost::Float64          = 5.0
     active_meas_std::Float64    = 1.0
-    meas_std::Float64           = 10.0
+    meas_std::Float64           = 50.0
 end
 
 const VDPTagProblem = Union{VDPTagMDP,VDPTagPOMDP}
