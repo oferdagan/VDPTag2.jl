@@ -172,7 +172,11 @@ function active_beam(rel_pos::Vec2)
     while angle <= 0.0
         angle += 2*pi
     end
-    bm = ceil(Int, 8*angle/(2*pi))
+    try
+        bm = ceil(Int, 8*angle/(2*pi))
+    catch
+        bm = 0
+    end
     return clamp(bm, 1, 8)
 end
 
