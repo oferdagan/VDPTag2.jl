@@ -173,6 +173,7 @@ function active_beam(rel_pos::Vec2)
         angle += 2*pi
     end
     try
+        global bm
         bm = ceil(Int, 8*angle/(2*pi))
     catch
         bm = 0
